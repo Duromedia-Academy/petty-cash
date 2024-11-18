@@ -72,10 +72,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
           <span>{item.title}</span>
         </Link>
       ))}
-      <button className="group flex items-center rounded-md px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-500/10">
-        <LogOut className="mr-2 h-4 w-4" />
-        <span>Sign Out</span>
-      </button>
+     
     </nav>
   );
 }

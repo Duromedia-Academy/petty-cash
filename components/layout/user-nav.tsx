@@ -8,7 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 
 interface UserNavProps {
@@ -20,11 +23,24 @@ interface UserNavProps {
 }
 
 export function UserNav({ user }: UserNavProps) {
+  const { toast } = useToast();
   const initials = user.name
     .split(" ")
     .map((n) => n[0])
     .join("")
     .toUpperCase();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      toast({
+        title: "Success",
+        description: "You have successfully signout in.",
+      });
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -45,9 +61,7 @@ export function UserNav({ user }: UserNavProps) {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600">
-          Sign out
-        </DropdownMenuItem>
+        <DropdownMenuItem className="text-red-600" onClick={handleSignOut}>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
