@@ -11,7 +11,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
-  FacebookAuthProvider,
 } from "firebase/auth";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import {
@@ -121,28 +120,6 @@ export default function RegisterForm() {
     }
   }
 
-  async function handleFacebookSignIn() {
-    setIsLoading(true);
-    try {
-      const provider = new FacebookAuthProvider();
-      const userCredential = await signInWithPopup(auth, provider);
-      await handleUserProfileCreation(userCredential);
-
-      toast({
-        title: "Success",
-        description: "You have successfully registered with Facebook.",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Facebook registration failed. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
   return (
     <>
       <Form {...form}>
@@ -219,15 +196,9 @@ export default function RegisterForm() {
           onClick={handleGoogleSignIn}
           disabled={isLoading}
         >
-          {isLoading ? "Signing in with Google..." : "Sign in with Google"}
+      Continue with Google
         </Button>
-        <Button
-          className="w-full bg-blue-600 hover:bg-blue-700"
-          onClick={handleFacebookSignIn}
-          disabled={isLoading}
-        >
-          {isLoading ? "Signing in with Facebook..." : "Sign in with Facebook"}
-        </Button>
+        
       </div>
       <div className="flex flex-col items-center space-y-2 text-center">
         <Link href="/" className="text-sm text-zinc-400 hover:underline">

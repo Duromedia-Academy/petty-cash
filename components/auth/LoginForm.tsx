@@ -14,9 +14,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { auth } from "@/lib/firebase";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -30,6 +37,7 @@ const formSchema = z.object({
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,17 +50,43 @@ export function LoginForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      // TODO: Implement Firebase authentication
-      console.log(values);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+
       toast({
         title: "Success",
         description: "You have successfully logged in.",
       });
+      router.push("/dashboard");
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Invalid credentials. Please try again.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      toast({
+        title: "Success",
+        description: "You have successfully logged in.",
+      });
+      router.push("/dashboard");
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Google registration failed. Please try again.",
       });
     } finally {
       setIsLoading(false);
@@ -117,11 +151,12 @@ export function LoginForm() {
         </form>
       </Form>
       <div className="flex items-center gap-5 text-center">
-        <Button className="w-full bg-red-600 hover:bg-red-700">
-          Sign in with Google
-        </Button>
-        <Button className="w-full bg-blue-600 hover:bg-blue-700">
-          Sign in with Facebook
+        <Button
+          className="w-full bg-red-600 hover:bg-red-700"
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+        >
+          Continue with Google
         </Button>
       </div>
       <div className="flex flex-col items-center space-y-2 text-center">
