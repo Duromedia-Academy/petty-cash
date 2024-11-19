@@ -1,5 +1,8 @@
+"use client";
+
 import { DashboardNav } from "@/components/layout/dashboard-nav";
 import { DashboardHeader } from "@/components/layout/dashboard-header";
+import withAuth from "@/components/hoc/withAuth";
 
 // TODO: Replace with actual user data from Firebase Auth
 const mockUser = {
@@ -8,11 +11,7 @@ const mockUser = {
   role: "administrator",
 };
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="min-h-screen">
       <DashboardHeader user={mockUser} />
@@ -26,4 +25,5 @@ export default function DashboardLayout({
       </div>
     </div>
   );
-}
+};
+export default withAuth(DashboardLayout);

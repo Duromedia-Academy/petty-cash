@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,7 +24,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
+import { useAuth } from "../context/authContext";
 
 const formSchema = z
   .object({
@@ -63,6 +64,13 @@ export default function RegisterForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      redirect("/dashboard");
+    }
+  }, [user]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -196,12 +204,11 @@ export default function RegisterForm() {
           onClick={handleGoogleSignIn}
           disabled={isLoading}
         >
-      Continue with Google
+          Continue with Google
         </Button>
-        
       </div>
       <div className="flex flex-col items-center space-y-2 text-center">
-        <Link href="/" className="text-sm text-zinc-400 hover:underline">
+        <Link href="/signin" className="text-sm text-zinc-400 hover:underline">
           Already have an account? Sign in
         </Link>
       </div>
