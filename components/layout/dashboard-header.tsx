@@ -1,15 +1,7 @@
 import { UserNav } from "@/components/layout/user-nav";
 import { ModeToggle } from "@/components/mode-toggle";
 
-interface DashboardHeaderProps {
-  user: {
-    name: string;
-    email: string;
-    role: string;
-  };
-}
-
-export function DashboardHeader({ user }: DashboardHeaderProps) {
+export function DashboardHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 items-center">
@@ -25,7 +17,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           </div>
           <div className="flex items-center gap-2">
             <ModeToggle />
-            <UserNav user={user} />
+            <UserNav />
           </div>
         </div>
       </div>

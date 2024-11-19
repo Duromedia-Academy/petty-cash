@@ -90,6 +90,7 @@ export function LoginForm() {
         title: "Success",
         description: "You have successfully logged in.",
       });
+      console.log(userCredential);
       router.push("/dashboard");
     } catch (error) {
       toast({

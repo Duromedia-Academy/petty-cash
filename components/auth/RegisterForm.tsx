@@ -46,7 +46,8 @@ const formSchema = z
 
 const handleUserProfileCreation = async (userCredential) => {
   const user = userCredential.user;
-  const { uid, email } = user;
+  console.log(user) 
+  const { uid, email, displayName, photoURL } = user;
   const usersCollection = collection(db, "users");
 
   const usersSnapshot = await getDocs(usersCollection);
@@ -57,6 +58,8 @@ const handleUserProfileCreation = async (userCredential) => {
     uid,
     email,
     role,
+    displayName,
+    photoURL,
   });
 };
 
