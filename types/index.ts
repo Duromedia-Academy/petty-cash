@@ -4,7 +4,8 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  name: string;
+  diaplayName: string;
+  photoURL?: string;
   department?: string;
 }
 
