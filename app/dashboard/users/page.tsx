@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { UserDialog } from "@/components/users/UserDialog";
-import { UserList } from "@/components/users/UserList";
+import UserList from "@/components/users/UserList";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 

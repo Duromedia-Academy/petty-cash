@@ -11,6 +11,7 @@ import {
   LogOut,
 } from "lucide-react";
 import type { UserRole } from "@/types";
+import { useAuth } from "../context/authContext";
 
 interface NavItem {
   title: string;
@@ -52,9 +53,10 @@ interface DashboardNavProps {
 
 export function DashboardNav({ userRole }: DashboardNavProps) {
   const pathname = usePathname();
+  const { role } = useAuth();
 
   const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(userRole)
+    item.roles.includes(role)
   );
 
   return (
