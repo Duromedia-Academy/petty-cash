@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -11,6 +12,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { PettyCashRequest } from "@/types";
+import { useAuth } from "../context/authContext";
+import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const mockRequests: PettyCashRequest[] = [
   {
@@ -37,7 +41,24 @@ const mockRequests: PettyCashRequest[] = [
   },
 ];
 
+
 export function RequestList() {
+  const { user } = useAuth();
+
+  const [filteredRequests, setFilteredRequests] = useState<PettyCashRequest[]>([]);
+
+  useEffect(() => {
+    const fetchRequests = async () => {
+      const requestCollection = collection(db, "requests");
+      const q = query(requestCollection, where("requesterId", "==", user.uid));
+      const requestSnapshot = await getDocs(q);
+      setFilteredRequests(requestSnapshot.docs.map((doc) => doc.data() as PettyCashRequest));
+      console.log(requestSnapshot.docs.map((doc) => doc.data() as PettyCashRequest));
+    };
+
+    fetchRequests();
+  }, [user]);
+
   return (
     <div className="rounded-md border">
       <Table>
@@ -51,10 +72,10 @@ export function RequestList() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockRequests.map((request) => (
+          {filteredRequests.map((request) => (
             <TableRow key={request.id}>
               <TableCell>
-                {format(request.createdAt, "MMM d, yyyy")}
+                {format(new Date(request.createdAt.seconds * 1000), "MMM d, yyyy")}
               </TableCell>
               <TableCell>{request.requesterName}</TableCell>
               <TableCell>{request.purpose}</TableCell>
