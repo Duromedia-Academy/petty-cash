@@ -23,17 +23,19 @@ export const AuthProvider: React.FC = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const  unsubscribe =  onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
 
-      const userEmail = currentUser.email;
+        const userEmail = currentUser.email;
 
-      const usersCollection = collection(db, "users");
+        const usersCollection = collection(db, "users");
 
-      const q = query(usersCollection, where("email", "==", userEmail));
-      const querySnapshot = await getDocs(q);
-      const userDetails = querySnapshot.docs[0].data();
-      setRole(userDetails.role);
+        const q = query(usersCollection, where("email", "==", userEmail));
+        const querySnapshot = await getDocs(q);
+        const userDetails = querySnapshot.docs[0].data();
+        setRole(userDetails.role);
+      }
       setLoading(false);
     });
     return () => unsubscribe();

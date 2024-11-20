@@ -25,13 +25,13 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["requester", "superior", "administrator"],
+    roles: ["requester", "superior", "accountant", "administrator"],
   },
   {
     title: "Requests",
     href: "/dashboard/requests",
     icon: FileText,
-    roles: ["requester", "superior", "administrator"],
+    roles: ["requester", "superior", "accountant", "administrator"],
   },
   {
     title: "User Management",
@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
     title: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ["administrator"],
+    roles: ["requester", "superior", "accountant", "administrator"],
   },
 ];
 
@@ -55,9 +55,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
   const pathname = usePathname();
   const { role } = useAuth();
 
-  const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(role)
-  );
+  const filteredNavItems = navItems.filter((item) => item.roles.includes(role));
 
   return (
     <nav className="grid items-start gap-2">
@@ -74,7 +72,6 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
           <span>{item.title}</span>
         </Link>
       ))}
-     
     </nav>
   );
 }
