@@ -16,31 +16,6 @@ import { useAuth } from "../context/authContext";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-const mockRequests: PettyCashRequest[] = [
-  {
-    id: "1",
-    requesterId: "user1",
-    requesterName: "John Doe",
-    amount: 150.00,
-    purpose: "Office Supplies",
-    status: "pending",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-  {
-    id: "2",
-    requesterId: "user2",
-    requesterName: "Jane Smith",
-    amount: 75.50,
-    purpose: "Team Lunch",
-    status: "approved",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    approvedBy: "admin1",
-    approverComment: "Approved for team building",
-  },
-];
-
 
 export function RequestList() {
   const { user } = useAuth();
