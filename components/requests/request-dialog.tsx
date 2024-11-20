@@ -22,6 +22,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { useAuth } from "../context/authContext";
 
 const formSchema = z.object({
   amount: z.string().min(1, "Amount is required"),
@@ -34,9 +37,31 @@ interface RequestDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const handleRequestCreation = async (data: {
+    amount: string;
+    purpose: string;
+    notes?: string;
+    uid: string;
+    displayName: string;
+  }) => {
+  
+  const { amount, purpose, notes, uid, displayName } = data;
+  const requestCollection = collection(db, "requests");
+  await addDoc(requestCollection, {
+    amount: parseFloat(amount),
+    purpose,
+    notes,
+    status: "pending",
+    requesterId: uid,
+    requesterName: displayName,
+    createdAt: serverTimestamp(),
+  });
+}
+
 export function RequestDialog({ open, onOpenChange }: RequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -50,14 +75,23 @@ export function RequestDialog({ open, onOpenChange }: RequestDialogProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // TODO: Implement request submission
-      console.log(values);
-      toast({
-        title: "Success",
-        description: "Your request has been submitted.",
-      });
-      onOpenChange(false);
-      form.reset();
+      if (user) {
+        const { uid, displayName } = user;
+        await handleRequestCreation({ ...values, uid, displayName });
+        console.log("Request submitted", user);
+        toast({
+          title: "Success",
+          description: "Your request has been submitted.",
+        });
+        onOpenChange(false);
+        form.reset();
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "User is not authenticated.",
+        });
+      }
     } catch (error) {
       toast({
         variant: "destructive",
