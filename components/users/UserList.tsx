@@ -45,12 +45,6 @@ const UserList = () => {
     setEditDialogOpen(true);
   };
 
-  const handleSave = (updatedUser: User) => {
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-    );
-  };
-
   return (
     <div className="space-y-4">
       {users.map((user) => (
@@ -94,7 +88,6 @@ const UserList = () => {
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
         user={selectedUser}
-        onSave={handleSave}
       />
     </div>
   );

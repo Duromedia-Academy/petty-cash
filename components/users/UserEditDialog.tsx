@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
@@ -10,7 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectItem,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Form,
   FormField,
@@ -21,12 +28,13 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { User } from "@/types/index";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface UserEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User | null;
-  onSave: (updatedUser: User) => void;
 }
 
 const userSchema = z.object({
@@ -35,12 +43,8 @@ const userSchema = z.object({
   role: z.enum(["administrator", "accountant", "superior", "requester"]),
 });
 
-function UserEditDialog({
-  open,
-  onOpenChange,
-  user,
-  onSave,
-}: UserEditDialogProps) {
+function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps) {
+  const { toast } = useToast();
   const form = useForm({
     resolver: zodResolver(userSchema),
     defaultValues: {
@@ -60,9 +64,18 @@ function UserEditDialog({
     }
   }, [user, form]);
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     if (user) {
-      onSave({ ...user, ...data });
+      const docRef = doc(db, "users", user.id);
+      await updateDoc(docRef, {
+        displayName: data.name,
+        email: data.email,
+        role: data.role,
+      });
+      toast({
+        title: "Success",
+        description: "User updated successfully.",
+      });
       onOpenChange(false);
     }
   };
