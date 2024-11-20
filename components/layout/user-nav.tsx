@@ -27,7 +27,7 @@ interface UserNavProps {
 }
 
 export function UserNav() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const { displayName, email, photoURL } = user;
   
   const { toast } = useToast();
@@ -57,7 +57,12 @@ export function UserNav() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
             {photoURL ? (
-              <Image src={photoURL} alt="User Avatar" width="100" height="100"  />
+              <Image
+                src={photoURL}
+                alt="User Avatar"
+                width="100"
+                height="100"
+              />
             ) : (
               <AvatarFallback>{initials}</AvatarFallback>
             )}
@@ -70,6 +75,9 @@ export function UserNav() {
             <p className="text-sm font-medium leading-none">{displayName}</p>
             <p className="text-xs leading-none text-muted-foreground">
               {email}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {role}
             </p>
           </div>
         </DropdownMenuLabel>
