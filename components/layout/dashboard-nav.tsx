@@ -25,13 +25,13 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["requester", "superior", "administrator"],
+    roles: ["requester", "superior", "administrator", "accountant"],
   },
   {
     title: "Requests",
     href: "/dashboard/requests",
     icon: FileText,
-    roles: ["requester", "superior", "administrator"],
+    roles: ["requester", "superior", "administrator", "accountant"],
   },
   {
     title: "User Management",

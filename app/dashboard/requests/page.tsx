@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { RequestList } from "@/components/requests/request-list";
+import RequestList from "@/components/requests/RequestList";
 import { RequestDialog } from "@/components/requests/request-dialog";
 import { RequestFilters } from "@/components/requests/request-filters";
 

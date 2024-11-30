@@ -4,7 +4,7 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  diaplayName: string;
+  displayName: string;
   photoURL?: string;
   department?: string;
 }
@@ -16,7 +16,7 @@ export interface PettyCashRequest {
   amount: number;
   purpose: string;
   notes?: string;
-  status: "pending" | "approved" | "rejected";
+  status: "pending" | "approved" | "rejected" | "completed" | "not completed" | "passed" | "not passed";
   createdAt: Date;
   updatedAt: Date;
   approvedBy?: string;
