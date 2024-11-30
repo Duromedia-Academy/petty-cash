@@ -16,7 +16,8 @@ const EditRequest = () => {
             try {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
-                    setRequestData(docSnap.data());
+                    const data = docSnap.data();
+                    setRequestData({ ...data, id: docSnap.id });
                     console.log("Document data:", docSnap.data());
                 } else {
                     console.log("No such document!");
@@ -33,7 +34,7 @@ const EditRequest = () => {
     <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold">Edit Request</h1>
         <div className="grid gap-6">
-            {requestData && <RequestForm defaultValues={requestData} />}
+            {requestData && <RequestForm defaultValues={requestData} requestId={requestData.id} />}
         </div>
     </div>
   )

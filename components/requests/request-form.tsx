@@ -89,7 +89,6 @@ const handleRequestUpdate = async (id: string, data: {
   department: string;
   purpose: string;
   items: Array<{
-    sn: string;
     details: string;
     quantity: number;
     unitPrice: number;
@@ -123,7 +122,7 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-
+  console.log(requestId);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues || {
