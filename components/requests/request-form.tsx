@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { addDoc, collection, serverTimestamp, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "../context/authContext";
 import { redirect } from "next/navigation";
@@ -85,14 +85,48 @@ const handleRequestCreation = async (data: {
   });
 };
 
-export function RequestForm() {
+const handleRequestUpdate = async (id: string, data: {
+  department: string;
+  purpose: string;
+  items: Array<{
+    sn: string;
+    details: string;
+    quantity: number;
+    unitPrice: number;
+    amount: number;
+  }>;
+  totalAmount: number;
+  amountInWords: string;
+  paymentSchedule: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    plantCode: string;
+  };
+  notes?: string;
+}) => {
+  const { department, purpose, items, totalAmount, amountInWords, paymentSchedule, notes } = data;
+  const requestDoc = doc(db, "requests", id);
+  await updateDoc(requestDoc, {
+    department,
+    purpose,
+    items,
+    totalAmount,
+    amountInWords,
+    paymentSchedule,
+    notes,
+    updatedAt: serverTimestamp(),
+  });
+};
+
+export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.infer<typeof formSchema>, requestId?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       department: "",
       purpose: "",
       items: [{ details: "", quantity: 1, unitPrice: 0.01, amount: 0.01 }],
@@ -118,12 +152,19 @@ export function RequestForm() {
     try {
       if (user) {
         const { uid, displayName } = user;
-        await handleRequestCreation({ ...values, uid, displayName });
-        console.log("Request submitted", user);
-        toast({
-          title: "Success",
-          description: "Your request has been submitted.",
-        });
+        if (requestId) {
+          await handleRequestUpdate(requestId, values);
+          toast({
+            title: "Success",
+            description: "Your request has been updated.",
+          });
+        } else {
+          await handleRequestCreation({ ...values, uid, displayName });
+          toast({
+            title: "Success",
+            description: "Your request has been submitted.",
+          });
+        }
         form.reset();
       } else {
         toast({
@@ -345,11 +386,11 @@ export function RequestForm() {
           )}
         />
         <div className="flex justify-end gap-4">
-          <Button type="button" variant="outline" onClick={() => form.reset()}>
+          <Button type="button" variant="outline" onClick={() => redirect("/dashboard/requests")}>
             Cancel
           </Button>
           <Button type="submit" disabled={isSubmitting}>
-            Submit Request
+            {requestId ? "Update Request" : "Submit Request"}
           </Button>
         </div>
       </form>

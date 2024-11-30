@@ -15,10 +15,11 @@ import type { PettyCashRequest } from "@/types";
 import { useAuth } from "../context/authContext";
 import { collection, getDocs, onSnapshot, or, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import RequestSheet from "./RequestSheet";
+import { useRouter } from "next/navigation";
 
 const RequestList = () => {
   const { user, role } = useAuth();
+  const router = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<PettyCashRequest | null>(null);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [filteredRequests, setFilteredRequests] = useState<PettyCashRequest[]>([]);
@@ -69,6 +70,7 @@ const RequestList = () => {
     setSelectedRequest(request);
     console.log(request);
     setRequestDialogOpen(true);
+    router.push(`/dashboard/requests/${request.id}`);
   }
 
   const handleSaveRequest = (updatedRequest: PettyCashRequest) => {
@@ -127,13 +129,6 @@ const RequestList = () => {
           ))}
         </TableBody>
       </Table>
-      <RequestSheet 
-        open={requestDialogOpen}
-        onOpenChange={setRequestDialogOpen}
-        request={selectedRequest}
-        // onSave={handleSaveRequest}
-        role={role}
-      />
     </div>
   );
 }

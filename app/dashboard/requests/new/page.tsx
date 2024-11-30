@@ -2,7 +2,7 @@ import { RequestForm } from '@/components/requests/request-form'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import React from 'react'
 
-const page = () => {
+const NewRequest = () => {
   return (
     <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold">New Request</h1>
@@ -20,4 +20,4 @@ const page = () => {
   )
 }
 
-export default page
+export default NewRequest
