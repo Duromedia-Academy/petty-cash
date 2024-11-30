@@ -13,7 +13,7 @@ export interface PettyCashRequest {
   id: string;
   requesterId: string;
   requesterName: string;
-  amount: number;
+  totalAmount: number;
   purpose: string;
   notes?: string;
   status: "pending" | "approved" | "rejected" | "completed" | "not completed" | "passed" | "not passed";
@@ -21,4 +21,18 @@ export interface PettyCashRequest {
   updatedAt: Date;
   approvedBy?: string;
   approverComment?: string;
+  department: string;
+  amountInWords: string;
+  paymentSchedule: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    plantCode: string;
+  };
+  items: Array<{
+    details: string;
+    quantity: number;
+    unitPrice: number;
+    amount: number;
+  }>;
 }

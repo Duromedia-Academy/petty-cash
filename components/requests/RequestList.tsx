@@ -101,7 +101,7 @@ const RequestList = () => {
                 <TableCell>{request.requesterName}</TableCell>
               }
               <TableCell>{request.purpose}</TableCell>
-              <TableCell>${request.amount.toFixed(2)}</TableCell>
+              <TableCell>${request.totalAmount}</TableCell>
               <TableCell>
                 <Badge
                   className={

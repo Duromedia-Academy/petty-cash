@@ -123,7 +123,7 @@ const RequestSheet = ({
                   <CardDescription>{request.notes}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4 text-lg">
-                  <p><strong>Amount:</strong> ${request.amount.toFixed(2)}</p>
+                  <p><strong>Amount:</strong> ${request.totalAmount}</p>
                   <p><strong>Status:</strong> 
                     <Badge
                       className={
