@@ -17,7 +17,11 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
 });
 
-export const AuthProvider: React.FC = ({ children }) => {
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -26,15 +30,19 @@ export const AuthProvider: React.FC = ({ children }) => {
     const  unsubscribe =  onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
 
-      const userEmail = currentUser.email;
+      if (currentUser) {
+        const userEmail = currentUser.email;
 
-      const usersCollection = collection(db, "users");
+        const usersCollection = collection(db, "users");
 
-      const q = query(usersCollection, where("email", "==", userEmail));
-      const querySnapshot = await getDocs(q);
-      const userDetails = querySnapshot.docs[0].data();
-      setRole(userDetails.role);
-      setLoading(false);
+        const q = query(usersCollection, where("email", "==", userEmail));
+        const querySnapshot = await getDocs(q);
+        const userDetails = querySnapshot.docs[0].data();
+        setRole(userDetails.role);
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
     });
     return () => unsubscribe();
   }, []);
