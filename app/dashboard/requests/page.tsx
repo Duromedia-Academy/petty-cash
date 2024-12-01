@@ -14,7 +14,7 @@ export default function RequestsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Petty Cash Requests</h1>
+        <h1 className="text-3xl font-bold">Requests</h1>
         <Button onClick={() => router.push('/dashboard/requests/new')}>
           <Plus className="mr-2 h-4 w-4" />
           New Request

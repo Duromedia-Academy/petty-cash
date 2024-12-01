@@ -95,7 +95,7 @@ const RequestList = () => {
         </TableHeader>
         <TableBody>
           {filteredRequests.map((request, index) => (
-            <TableRow key={index} onClick={() => handleViewRequest(request)}>
+            <TableRow key={index} onClick={() => handleViewRequest(request)} className="cursor-pointer">
               <TableCell>
                 {request.createdAt && format(new Date(request.createdAt.seconds * 1000), "MMM d, yyyy")}
               </TableCell>
