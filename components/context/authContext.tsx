@@ -27,10 +27,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const  unsubscribe =  onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
+        setUser(currentUser);
+
         const userEmail = currentUser.email;
 
         const usersCollection = collection(db, "users");
@@ -40,10 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const userDetails = querySnapshot.docs[0].data();
         setUser({ ...currentUser, displayName: userDetails.displayName });
         setRole(userDetails.role);
-        setLoading(false);
-      } else {
-        setLoading(false);
       }
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);

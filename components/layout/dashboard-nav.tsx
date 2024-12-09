@@ -8,7 +8,6 @@ import {
   FileText,
   Users,
   Settings,
-  LogOut,
 } from "lucide-react";
 import type { UserRole } from "@/types";
 import { useAuth } from "../context/authContext";
@@ -43,15 +42,12 @@ const navItems: NavItem[] = [
     title: "Settings",
     href: "/dashboard/settings",
     icon: Settings,
-    roles: ["administrator"],
+    roles: ["requester", "superior", "accountant", "administrator"],
   },
 ];
 
-interface DashboardNavProps {
-  userRole: UserRole;
-}
 
-export function DashboardNav({ userRole }: DashboardNavProps) {
+export function DashboardNav() {
   const pathname = usePathname();
   const { role } = useAuth() as { role: UserRole };
   const filteredNavItems = navItems.filter((item) =>
