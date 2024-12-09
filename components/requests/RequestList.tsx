@@ -16,12 +16,12 @@ import { useAuth } from "../context/authContext";
 import { collection, getDocs, onSnapshot, or, orderBy, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { EyeIcon, Pencil, Trash, CircleEllipsis } from "lucide-react";
 
 const RequestList = () => {
   const { user, role } = useAuth();
   const router = useRouter();
-  const [selectedRequest, setSelectedRequest] = useState<PettyCashRequest | null>(null);
-  const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [filteredRequests, setFilteredRequests] = useState<PettyCashRequest[]>([]);
 
   useEffect(() => {
@@ -54,7 +54,8 @@ const RequestList = () => {
       } else {
         q = query(requestCollection, where("requesterId", "==", user?.uid));
       }
-      const requestSnapshot = await onSnapshot(q, (snapshot) => {
+
+      await onSnapshot(q, (snapshot) => {
         const requests: PettyCashRequest[] = snapshot.docs.map((doc) => ({
           ...doc.data(),
           id: doc.id, // Include the document ID
@@ -65,19 +66,6 @@ const RequestList = () => {
 
     fetchRequests();
   }, [user]);
-
-  const handleViewRequest = (request: PettyCashRequest) => {
-    setSelectedRequest(request);
-    console.log(request);
-    setRequestDialogOpen(true);
-    router.push(`/dashboard/requests/${request.id}`);
-  }
-
-  const handleSaveRequest = (updatedRequest: PettyCashRequest) => {
-    setFilteredRequests((prevRequests) =>
-      prevRequests.map((request) => (request.id === updatedRequest.id ? updatedRequest : request))
-    );
-  };
 
   return (
     <div className="rounded-md border">
@@ -91,11 +79,12 @@ const RequestList = () => {
             <TableHead>Purpose</TableHead>
             <TableHead>Amount</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {filteredRequests.map((request, index) => (
-            <TableRow key={index} onClick={() => handleViewRequest(request)} className="cursor-pointer">
+            <TableRow key={index} className="cursor-pointer">
               <TableCell>
                 {request.createdAt && format(new Date(request.createdAt.seconds * 1000), "MMM d, yyyy")}
               </TableCell>
@@ -124,6 +113,29 @@ const RequestList = () => {
                 >
                   {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                 </Badge>
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                      <CircleEllipsis size={30} className="font-normal" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="space-x-3" onClick={() => router.push(`/dashboard/requests/${request.id}`)}>
+                        <EyeIcon size={20} />
+                        <span>View</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="space-x-3" onClick={() => router.push(`/dashboard/requests/${request.id}/edit`)}>
+                        <Pencil size={20} />
+                        <span>Edit</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-red-600 focus:text-white focus:bg-red-600 space-x-3">
+                        <Trash size={20} />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
