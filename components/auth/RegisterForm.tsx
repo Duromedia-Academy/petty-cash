@@ -29,6 +29,9 @@ import { useAuth } from "../context/authContext";
 
 const formSchema = z
   .object({
+    fullName: z.string().min(1, {
+      message: "Full name is required.",
+    }),
     email: z.string().email({
       message: "Please enter a valid email address.",
     }),
@@ -44,16 +47,24 @@ const formSchema = z
     path: ["confirmPassword"],
   });
 
-const handleUserProfileCreation = async (userCredential) => {
+interface UserCredential {
+  user: {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+  };
+}
+
+const handleUserProfileCreation = async (userCredential: UserCredential, displayName: string): Promise<void> => {
   const user = userCredential.user;
-  console.log(user) 
-  const { uid, email, displayName, photoURL } = user;
+  const { uid, email, photoURL } = user;
   const usersCollection = collection(db, "users");
 
   const usersSnapshot = await getDocs(usersCollection);
   const isFirstUser = usersSnapshot.empty;
 
-  const role = isFirstUser ? "administrator" : "user";
+  const role = isFirstUser ? "administrator" : "requester";
   await addDoc(usersCollection, {
     uid,
     email,
@@ -78,6 +89,7 @@ export default function RegisterForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      fullName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -92,7 +104,7 @@ export default function RegisterForm() {
         values.email,
         values.password
       );
-      await handleUserProfileCreation(userCredential);
+      await handleUserProfileCreation(userCredential, values.fullName);
       toast({
         title: "Success",
         description: "You have successfully registered.",
@@ -113,7 +125,7 @@ export default function RegisterForm() {
     try {
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
-      handleUserProfileCreation(userCredential);
+      handleUserProfileCreation(userCredential, userCredential.user.displayName || "Google User");
 
       toast({
         title: "Success",
@@ -135,6 +147,24 @@ export default function RegisterForm() {
     <>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="fullName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-white">Full Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="John Doe"
+                    {...field}
+                    disabled={isLoading}
+                    className="bg-zinc-800 border-zinc-700 text-white"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"

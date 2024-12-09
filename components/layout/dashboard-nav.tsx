@@ -53,10 +53,9 @@ interface DashboardNavProps {
 
 export function DashboardNav({ userRole }: DashboardNavProps) {
   const pathname = usePathname();
-  const { role } = useAuth();
-
+  const { role } = useAuth() as { role: UserRole };
   const filteredNavItems = navItems.filter((item) =>
-    item.roles.includes(role)
+    role && item.roles.includes(role)
   );
 
   return (

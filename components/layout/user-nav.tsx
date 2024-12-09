@@ -28,7 +28,9 @@ interface UserNavProps {
 
 export function UserNav() {
   const { user, role } = useAuth();
-  const { displayName, email, photoURL } = user;
+  const displayName = user?.displayName || "";
+  const email = user?.email || "";
+  const photoURL = user?.photoURL || "";
   
   const { toast } = useToast();
   const initials = displayName
@@ -44,7 +46,7 @@ export function UserNav() {
       await signOut(auth);
       toast({
         title: "Success",
-        description: "You have successfully signout in.",
+        description: "You have successfully signout.",
       });
     } catch (error) {
       console.error("Error signing out:", error);

@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const q = query(usersCollection, where("email", "==", userEmail));
         const querySnapshot = await getDocs(q);
         const userDetails = querySnapshot.docs[0].data();
+        setUser({ ...currentUser, displayName: userDetails.displayName });
         setRole(userDetails.role);
         setLoading(false);
       } else {
