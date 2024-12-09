@@ -16,12 +16,12 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen">
       <DashboardHeader user={mockUser} />
       <div className="flex">
-        <aside className="hidden w-64 border-r bg-muted/40 md:block">
+        <aside className="hidden w-64 border-r bg-muted/40 md:block h-[calc(100vh-3.5rem)] sticky top-14">
           <div className="space-y-4 py-4">
             <DashboardNav userRole="administrator" />
           </div>
         </aside>
-        <main className="flex-1 p-8">{children}</main>
+        <main className="container mx-auto flex-1 p-8">{children}</main>
       </div>
     </div>
   );

@@ -25,13 +25,13 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-    roles: ["requester", "superior", "accountant", "administrator"],
+    roles: ["requester", "superior", "administrator", "accountant"],
   },
   {
     title: "Requests",
     href: "/dashboard/requests",
     icon: FileText,
-    roles: ["requester", "superior", "accountant", "administrator"],
+    roles: ["requester", "superior", "administrator", "accountant"],
   },
   {
     title: "User Management",
@@ -58,13 +58,13 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
   const filteredNavItems = navItems.filter((item) => item.roles.includes(role));
 
   return (
-    <nav className="grid items-start gap-2">
+    <nav className="grid items-start">
       {filteredNavItems.map((item) => (
         <Link
           key={item.href}
           href={item.href}
           className={cn(
-            "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+            "group flex items-center rounded-md px-3 py-4 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
             pathname === item.href ? "bg-accent" : "transparent"
           )}
         >
@@ -72,6 +72,7 @@ export function DashboardNav({ userRole }: DashboardNavProps) {
           <span>{item.title}</span>
         </Link>
       ))}
+    
     </nav>
   );
 }
