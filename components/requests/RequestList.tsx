@@ -13,16 +13,22 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import type { PettyCashRequest } from "@/types";
 import { useAuth } from "../context/authContext";
-import { collection, getDocs, onSnapshot, or, orderBy, query, where } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, or, orderBy, query, where, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuShortcut, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { EyeIcon, Pencil, Trash, CircleEllipsis } from "lucide-react";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 const RequestList = () => {
   const { user, role } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [filteredRequests, setFilteredRequests] = useState<PettyCashRequest[]>([]);
+  const [selectedRequest, setSelectedRequest] = useState<PettyCashRequest | null>(null);
+  const [showDialog, setShowDialog] = useState(false);
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -66,6 +72,26 @@ const RequestList = () => {
 
     fetchRequests();
   }, [user]);
+
+  const handleDelete = async () => {
+    if (selectedRequest) {
+      if (selectedRequest.requesterId === user?.uid || role === "administrator") {
+        await deleteDoc(doc(db, "requests", selectedRequest.id));
+        toast({
+          title: "Request Deleted",
+          description: "The request has been successfully deleted.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Unauthorized",
+          description: "You are not authorized to delete this request.",
+        });
+      }
+      setShowDialog(false);
+      setSelectedRequest(null);
+    }
+  };
 
   return (
     <div className="rounded-md border">
@@ -129,7 +155,10 @@ const RequestList = () => {
                         <Pencil size={20} />
                         <span>Edit</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-red-600 focus:text-white focus:bg-red-600 space-x-3">
+                      <DropdownMenuItem className="text-destructive focus:text-white focus:bg-destructive space-x-3" onClick={() => {
+                        setSelectedRequest(request);
+                        setShowDialog(true);
+                      }}>
                         <Trash size={20} />
                         <span>Delete</span>
                       </DropdownMenuItem>
@@ -141,6 +170,22 @@ const RequestList = () => {
           ))}
         </TableBody>
       </Table>
+      <Dialog open={showDialog} onOpenChange={setShowDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Deletion</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this request?</p>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setShowDialog(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete}>
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
