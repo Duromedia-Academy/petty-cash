@@ -26,20 +26,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchUserData = async (currentUser: User) => {
+    const userEmail = currentUser.email;
+    const usersCollection = collection(db, "users");
+    const q = query(usersCollection, where("email", "==", userEmail));
+    const querySnapshot = await getDocs(q);
+    const userDetails = querySnapshot.docs[0].data();
+    setUser({ ...currentUser, displayName: userDetails.displayName, docId: querySnapshot.docs[0].id });
+    setRole(userDetails.role);
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        setUser(currentUser);
-
-        const userEmail = currentUser.email;
-
-        const usersCollection = collection(db, "users");
-
-        const q = query(usersCollection, where("email", "==", userEmail));
-        const querySnapshot = await getDocs(q);
-        const userDetails = querySnapshot.docs[0].data();
-        setUser({ ...currentUser, displayName: userDetails.displayName });
-        setRole(userDetails.role);
+        await fetchUserData(currentUser);
       }
       setLoading(false);
     });
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, loading }}>
+    <AuthContext.Provider value={{ user, role, loading, setLoading, fetchUserData }}>
       {children}
     </AuthContext.Provider>
   );

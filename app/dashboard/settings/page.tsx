@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SettingsForm } from "@/components/settings/settings-form";
+import { UserDetailsForm, PasswordForm } from "@/components/settings/settings-form";
 
 export default function SettingsPage() {
   return (
@@ -8,10 +8,18 @@ export default function SettingsPage() {
       <div className="grid gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Account Settings</CardTitle>
+            <CardTitle>Account Details</CardTitle>
           </CardHeader>
           <CardContent>
-            <SettingsForm />
+            <UserDetailsForm />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Change Password</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PasswordForm />
           </CardContent>
         </Card>
       </div>
