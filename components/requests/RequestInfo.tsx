@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { PettyCashRequest, UserRole } from "@/types";
 import { format } from "date-fns";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useState } from "react";
@@ -29,14 +29,18 @@ const RequestInfo = ({
   role,
   refetchData, // Destructure refetchData
 }: RequestInfoProps) => {
+  const [loading, setLoading] = useState(false);
+
   const updateStatus = async (status: "approved" | "rejected" | "completed" | "not completed" | "passed" | "not passed") => {
     if (request) {
+      setLoading(true);
       const requestRef = doc(db, "requests", request.id); // Use request.id for the document ID
       await updateDoc(requestRef, {
         status: status
       });
       // Call refetchData after updating the status
       refetchData();
+      setLoading(false);
     }
   };
 
@@ -49,16 +53,18 @@ const RequestInfo = ({
               variant="outline"
               className="border-red-500 text-red-500 hover:bg-red-100"
               onClick={() => updateStatus("not completed")}
+              disabled={loading}
             >
-              <XCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <XCircle className="mr-2 h-5 w-5" />}
               Not Completed
             </Button>
             <Button
               variant="outline"
               className="border-green-500 text-green-500 hover:bg-green-100"
               onClick={() => updateStatus("completed")}
+              disabled={loading}
             >
-              <CheckCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle className="mr-2 h-5 w-5" />}
               Completed
             </Button>
           </>
@@ -70,16 +76,18 @@ const RequestInfo = ({
               variant="outline"
               className="border-red-500 text-red-500 hover:bg-red-100"
               onClick={() => updateStatus("rejected")}
+              disabled={loading}
             >
-              <XCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <XCircle className="mr-2 h-5 w-5" />}
               Not Approved
             </Button>
             <Button
               variant="outline"
               className="border-green-500 text-green-500 hover:bg-green-100"
               onClick={() => updateStatus("approved")}
+              disabled={loading}
             >
-              <CheckCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle className="mr-2 h-5 w-5" />}
               Approved
             </Button>
           </>
@@ -91,16 +99,18 @@ const RequestInfo = ({
               variant="outline"
               className="border-red-500 text-red-500 hover:bg-red-100"
               onClick={() => updateStatus("not passed")}
+              disabled={loading}
             >
-              <XCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <XCircle className="mr-2 h-5 w-5" />}
               Not Passed
             </Button>
             <Button
               variant="outline"
               className="border-green-500 text-green-500 hover:bg-green-100"
               onClick={() => updateStatus("passed")}
+              disabled={loading}
             >
-              <CheckCircle className="mr-2 h-5 w-5" />
+              {loading ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <CheckCircle className="mr-2 h-5 w-5" />}
               Passed
             </Button>
           </>
@@ -152,8 +162,9 @@ const RequestInfo = ({
                 <h4 className="text-base">Amount</h4>
                 <p className="text-lg font-semibold">{request.totalAmount}</p>
               </div>
-              <div className="col-span-2 font-semibold capitalize">
-                <p>{request.amountInWords}</p>
+              <div className="col-span-2 space-y-2">
+                <h4 className="text-base">Amount in Words</h4>
+                <p className="font-semibold capitalize">{request.amountInWords}</p>
               </div>
             </div>
             <div className="flex items-center justify-start gap-5 flex-wrap">

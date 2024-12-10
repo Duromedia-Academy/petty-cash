@@ -162,9 +162,10 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
     items.forEach((item, index) => {
       const quantity = numeral(item.quantity).value();
       const unitPrice = numeral(item.unitPrice).value();
-      const amount = (quantity ?? 0) * (unitPrice ?? 0);
+      let amount = (quantity ?? 0) * (unitPrice ?? 0);
+      amount = numeral(amount).format('0.00'); // Format amount to two decimal places
       form.setValue(`items.${index}.amount`, amount);
-      totalAmount += amount;
+      totalAmount += parseFloat(amount);
     });
     totalAmount = numeral(totalAmount).format('0.00');
     form.setValue("totalAmount", totalAmount);
