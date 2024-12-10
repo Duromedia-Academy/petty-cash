@@ -28,6 +28,8 @@
     "lucide-react": "^0.330.0",
     "next": "^15.0.3",
     "next-themes": "^0.2.1",
+    "number-to-words": "^1.2.4",
+    "numeral": "^2.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.50.0",
@@ -39,6 +41,8 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.16",
+    "@types/number-to-words": "^1.2.3",
+    "@types/numeral": "^2.0.5",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.17",

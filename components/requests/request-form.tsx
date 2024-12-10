@@ -21,12 +21,20 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "../context/authContext";
 import { redirect } from "next/navigation";
 import { X } from "lucide-react";
+import numeral from "numeral";
+import { toWords } from "number-to-words";
 
 const itemSchema = z.object({
   details: z.string().min(1, "Details are required"),
-  quantity: z.number().min(1, "Quantity must be at least 1"),
-  unitPrice: z.number().min(0.01, "Unit price must be at least 0.01"),
-  amount: z.number().min(0.01, "Amount must be at least 0.01"),
+  quantity: z.union([z.number(), z.string()]).refine((val) => !isNaN(Number(val)), {
+    message: "Quantity must be a number",
+  }),
+  unitPrice: z.union([z.number(), z.string()]).refine((val) => !isNaN(Number(val)), {
+    message: "Unit price must be a number",
+  }),
+  amount: z.union([z.number(), z.string()]).refine((val) => !isNaN(Number(val)), {
+    message: "Amount must be a number",
+  }),
 });
 
 const paymentScheduleSchema = z.object({
@@ -40,7 +48,9 @@ const formSchema = z.object({
   department: z.string().min(1, "Department is required"),
   purpose: z.string().min(3, "Purpose must be at least 3 characters"),
   items: z.array(itemSchema).min(1, "At least one item is required"),
-  totalAmount: z.number().min(0.01, "Total amount must be at least 0.01"),
+  totalAmount: z.union([z.number(), z.string()]).refine((val) => !isNaN(Number(val)), {
+    message: "Total amount must be a number",
+  }),
   amountInWords: z.string().min(1, "Amount in words is required"),
   paymentSchedule: paymentScheduleSchema,
   notes: z.string().optional(),
@@ -146,6 +156,28 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
     name: "items",
   });
 
+  const calculateAmounts = () => {
+    const items = form.getValues("items");
+    let totalAmount = 0;
+    items.forEach((item, index) => {
+      const quantity = numeral(item.quantity).value();
+      const unitPrice = numeral(item.unitPrice).value();
+      const amount = (quantity ?? 0) * (unitPrice ?? 0);
+      form.setValue(`items.${index}.amount`, amount);
+      totalAmount += amount;
+    });
+    totalAmount = numeral(totalAmount).format('0.00');
+    form.setValue("totalAmount", totalAmount);
+
+    const [naira, kobo] = totalAmount.toString().split(".");
+    const amountInWords = `${toWords(naira)} naira ${toWords(kobo)} kobo`;
+    form.setValue("amountInWords", amountInWords);
+  };
+
+  const handleItemChange = () => {
+    calculateAmounts();
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -226,7 +258,7 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
                       <FormItem>
                         <FormLabel>Details</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter details" {...field} />
+                          <Input placeholder="Enter details" {...field} onChange={(e) => { field.onChange(e); handleItemChange(); }} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -241,7 +273,7 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
                       <FormItem>
                         <FormLabel>Quantity</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="Enter quantity" {...field} />
+                          <Input type="number" placeholder="Enter quantity" {...field} onChange={(e) => { field.onChange(e); handleItemChange(); }} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -256,7 +288,7 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
                       <FormItem>
                         <FormLabel>Unit Price</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="Enter unit price" {...field} />
+                          <Input type="number" step="0.01" placeholder="Enter unit price" {...field} onChange={(e) => { field.onChange(e); handleItemChange(); }} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -271,20 +303,20 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
                       <FormItem>
                         <FormLabel>Amount</FormLabel>
                         <FormControl>
-                          <Input type="number" step="0.01" placeholder="Enter amount" {...field} />
+                          <Input type="number" step="0.01" placeholder="Enter amount" {...field} readOnly />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-                <Button type="button" variant="outline" onClick={() => remove(index)} className="text-red-500 self-end justify-self-end">
+                <Button type="button" variant="outline" onClick={() => { remove(index); handleItemChange(); }} className="text-red-500 self-end justify-self-end">
                   <X size={22} />
                 </Button>
               </div>
             ))}
           </div>
-          <Button type="button" onClick={() => append({ details: "", quantity: 1, unitPrice: 0.01, amount: 0.01 })}>
+          <Button type="button" onClick={() => { append({ details: "", quantity: 1, unitPrice: 0.01, amount: 0.01 }); handleItemChange(); }}>
             Add Item
           </Button>
         </div>

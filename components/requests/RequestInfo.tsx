@@ -152,7 +152,9 @@ const RequestInfo = ({
                 <h4 className="text-base">Amount</h4>
                 <p className="text-lg font-semibold">{request.totalAmount}</p>
               </div>
-              <div className="col-span-2 font-semibold">Five Hundred Thousand Naira Kuwait Only</div>
+              <div className="col-span-2 font-semibold capitalize">
+                <p>{request.amountInWords}</p>
+              </div>
             </div>
             <div className="flex items-center justify-start gap-5 flex-wrap">
               <div className="w-40 space-y-2">

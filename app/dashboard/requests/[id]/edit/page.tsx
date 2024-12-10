@@ -22,7 +22,7 @@ const EditRequest = () => {
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data();
-                    if (data.createdBy !== user.uid && role !== "administrator") {
+                    if (data.requesterId !== user.uid && role !== "administrator") {
                         toast({
                             variant: "destructive",
                             title: "Unauthorized",
