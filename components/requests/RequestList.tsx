@@ -123,18 +123,18 @@ const RequestList = () => {
                 <Badge
                   className={
                     request.status === "approved"
-                    ? "bg-green-500 text-white ml-2"
-                    : request.status === "completed"
-                    ? "bg-green-300 text-white ml-2"
-                    : request.status === "passed"
-                    ? "bg-lime-500 text-white ml-2"
-                    : request.status === "rejected"
-                    ? "bg-red-500 text-white ml-2"
-                    : request.status === "not completed"
-                    ? "bg-orange-500 text-white ml-2"
-                    : request.status === "not passed"
-                    ? "bg-red-700 text-white ml-2"
-                    : "bg-gray-800 text-white ml-2"
+                ? "bg-green-500 text-white ml-2"
+                : request.status === "completed"
+                ? "bg-green-800 text-white ml-2"
+                : request.status === "passed"
+                ? "bg-lime-500 text-white ml-2"
+                : request.status === "rejected"
+                ? "bg-red-600 text-white ml-2"
+                : request.status === "not completed"
+                ? "bg-orange-800 text-white ml-2"
+                : request.status === "not passed"
+                ? "bg-red-500 text-white ml-2"
+                : "bg-gray-800 text-white ml-2"
                     }
                 >
                   {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
