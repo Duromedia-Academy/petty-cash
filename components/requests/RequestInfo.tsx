@@ -124,7 +124,12 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
   };
 
   if (!request) {
-    return <p>No request selected. Please select a request to view details.</p>;
+    return (
+      <div className="h-80 flex flex-col items-start justify-center">
+        <p className="mb-4">Request is unavailable. Please select a request to view details.</p>
+        <Button onClick={() => router.push('/dashboard/requests')}>Go to Requests</Button>
+      </div>
+    );
   }
 
   return (
