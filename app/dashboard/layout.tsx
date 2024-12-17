@@ -20,4 +20,4 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default withAuth(DashboardLayout);
+export default DashboardLayout;

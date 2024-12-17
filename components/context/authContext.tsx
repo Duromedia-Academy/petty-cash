@@ -32,13 +32,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const q = query(usersCollection, where("email", "==", userEmail));
     const querySnapshot = await getDocs(q);
     const userDetails = querySnapshot.docs[0].data();
-    setUser({ ...currentUser, displayName: userDetails.displayName, docId: querySnapshot.docs[0].id });
+    setUser({
+      ...currentUser,
+      displayName: userDetails.displayName,
+      docId: querySnapshot.docs[0].id,
+    });
     setRole(userDetails.role);
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
+        const token = await currentUser.getIdToken();
+        document.cookie = `token=${token}; path=/;`;
+
         await fetchUserData(currentUser);
       }
       setLoading(false);
@@ -47,7 +54,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, setLoading, fetchUserData }}>
+    <AuthContext.Provider
+      value={{ user, role, loading, setLoading, fetchUserData }}
+    >
       {children}
     </AuthContext.Provider>
   );

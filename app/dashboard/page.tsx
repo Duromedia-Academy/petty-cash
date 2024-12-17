@@ -8,10 +8,6 @@ import { useAuth } from "@/components/context/authContext";
 const DashboardPage = () => {
   const { loading } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>; // Show loading state while checking authentication
-  }
-
   return (
     <div className="flex flex-col gap-8">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

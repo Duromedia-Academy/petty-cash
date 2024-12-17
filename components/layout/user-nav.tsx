@@ -44,6 +44,9 @@ export function UserNav() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+       document.cookie =
+         "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+         window.location.href = "/signin";
       toast({
         title: "Success",
         description: "You have successfully signout.",
