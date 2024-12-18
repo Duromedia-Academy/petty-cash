@@ -1,14 +1,15 @@
-"use client"
+"use client";
 
+import { useState } from "react";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import { format } from "date-fns";
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { PettyCashRequest, UserRole } from "@/types";
+import { useRouter } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { PettyCashRequest, UserRole } from "@/types";
-import { format } from "date-fns";
-import { CheckCircle, XCircle } from "lucide-react";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,94 +22,115 @@ import {
 interface RequestInfoProps {
   request: PettyCashRequest | null;
   role: UserRole;
-  refetchData: () => void; // Add refetchData prop
+  refetchData: () => void;
 }
 
-const RequestInfo = ({
-  request,
-  role,
-  refetchData, // Destructure refetchData
-}: RequestInfoProps) => {
-  const updateStatus = async (status: "approved" | "rejected" | "completed" | "not completed" | "passed" | "not passed") => {
-    if (request) {
-      const requestRef = doc(db, "requests", request.id); // Use request.id for the document ID
-      await updateDoc(requestRef, {
-        status: status
-      });
-      // Call refetchData after updating the status
-      refetchData();
+const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  const updateStatus = async (status: string) => {
+    if (!request) return;
+    setLoading(true);
+    try {
+      const requestRef = doc(db, "requests", request.id);
+      await updateDoc(requestRef, { status });
+      refetchData(); // Refresh data after successful update
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update request status. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   const getStatusButtons = () => {
-    switch (role) {
-      case "accountant":
-        return (
-          <>
-            <Button
-              variant="outline"
-              className="border-red-500 text-red-500 hover:bg-red-100"
-              onClick={() => updateStatus("not completed")}
-            >
-              <XCircle className="mr-2 h-5 w-5" />
-              Not Completed
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-500 text-green-500 hover:bg-green-100"
-              onClick={() => updateStatus("completed")}
-            >
-              <CheckCircle className="mr-2 h-5 w-5" />
-              Completed
-            </Button>
-          </>
-        );
-      case "administrator":
-        return (
-          <>
-            <Button
-              variant="outline"
-              className="border-red-500 text-red-500 hover:bg-red-100"
-              onClick={() => updateStatus("rejected")}
-            >
-              <XCircle className="mr-2 h-5 w-5" />
-              Not Approved
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-500 text-green-500 hover:bg-green-100"
-              onClick={() => updateStatus("approved")}
-            >
-              <CheckCircle className="mr-2 h-5 w-5" />
-              Approved
-            </Button>
-          </>
-        );
-      case "superior":
-        return (
-          <>
-            <Button
-              variant="outline"
-              className="border-red-500 text-red-500 hover:bg-red-100"
-              onClick={() => updateStatus("not passed")}
-            >
-              <XCircle className="mr-2 h-5 w-5" />
-              Not Passed
-            </Button>
-            <Button
-              variant="outline"
-              className="border-green-500 text-green-500 hover:bg-green-100"
-              onClick={() => updateStatus("passed")}
-            >
-              <CheckCircle className="mr-2 h-5 w-5" />
-              Passed
-            </Button>
-          </>
-        );
-      default:
-        return null;
+    if (!request) return null;
+
+    const { status } = request;
+    let buttons :any[] = [];
+
+    if (role === "superior") {
+      buttons = [
+        {
+          status: "not passed",
+          label: "Not Pass",
+          disabled: status === "not passed" || status === "approved" || status === "not completed" || status === "completed",
+          action: () => updateStatus("not passed"),
+        },
+        {
+          status: "passed",
+          label: "Pass",
+          disabled: status === "passed" || status === "approved" || status === "not completed" || status === "completed",
+          action: () => updateStatus("passed"),
+        },
+      ];
+    } else if (role === "administrator") {
+      buttons = [
+        {
+          status: "rejected",
+          label: "Reject",
+          disabled: status === "rejected" || status === "completed",
+          action: () => updateStatus("rejected"),
+        },
+        {
+          status: "approved",
+          label: "Approve",
+          disabled: status === "approved" || status === "completed",
+          action: () => updateStatus("approved"),
+        },
+      ];
+    } else if (role === "accountant") {
+      buttons = [
+        {
+          status: "not completed",
+          label: "Incomplete",
+          disabled: status === "not completed",
+          action: () => updateStatus("not completed"),
+        },
+        {
+          status: "completed",
+          label: "Complete",
+          disabled: status === "completed",
+          action: () => updateStatus("completed"),
+        },
+      ];
     }
+
+    return buttons.map(({ status, label, disabled, action }) => (
+      <Button
+        key={status}
+        variant="outline"
+        disabled={disabled || loading}
+        onClick={action}
+        className={
+          disabled
+        ? "border-gray-300 text-gray-500 cursor-not-allowed"
+        : status === "completed" || status === "approved" || status === "passed"
+        ? "border-green-500 text-green-500 hover:text-green-500 hover:bg-green-100"
+        : "border-red-500 text-red-500 hover:text-red-500 hover:bg-red-100"
+        }
+      >
+        {loading ? (
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+        ) : status === "completed" || status === "approved" || status === "passed" ? (
+          <CheckCircle className="mr-2 h-5 w-5" />
+        ) : (
+          <XCircle className="mr-2 h-5 w-5" />
+        )}
+        {label}
+      </Button>
+    ));
   };
+
+  if (!request) {
+    return (
+      <div className="h-80 flex flex-col items-start justify-center">
+        <p className="mb-4">Request is unavailable. Please select a request to view details.</p>
+        <Button onClick={() => router.push('/dashboard/requests')}>Go to Requests</Button>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -125,15 +147,15 @@ const RequestInfo = ({
                 request.status === "approved"
                 ? "bg-green-500 text-white ml-2 text-sm"
                 : request.status === "completed"
-                ? "bg-green-300 text-white ml-2 text-sm"
+                ? "bg-green-800 text-white ml-2 text-sm"
                 : request.status === "passed"
                 ? "bg-lime-500 text-white ml-2 text-sm"
                 : request.status === "rejected"
-                ? "bg-red-500 text-white ml-2 text-sm"
+                ? "bg-red-600 text-white ml-2 text-sm"
                 : request.status === "not completed"
-                ? "bg-orange-500 text-white ml-2 text-sm"
+                ? "bg-orange-800 text-white ml-2 text-sm"
                 : request.status === "not passed"
-                ? "bg-red-700 text-white ml-2 text-sm"
+                ? "bg-red-500 text-white ml-2 text-sm"
                 : "bg-gray-800 text-white ml-2 text-sm"
                 }
               >
@@ -152,8 +174,9 @@ const RequestInfo = ({
                 <h4 className="text-base">Amount</h4>
                 <p className="text-lg font-semibold">{request.totalAmount}</p>
               </div>
-              <div className="col-span-2 font-semibold capitalize">
-                <p>{request.amountInWords}</p>
+              <div className="col-span-2 space-y-2">
+                <h4 className="text-base">Amount in Words</h4>
+                <p className="font-semibold capitalize">{request.amountInWords}</p>
               </div>
             </div>
             <div className="flex items-center justify-start gap-5 flex-wrap">
