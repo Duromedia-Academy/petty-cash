@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useAuth } from "@/components/context/authContext";
 import { redirect } from "next/navigation";
 
