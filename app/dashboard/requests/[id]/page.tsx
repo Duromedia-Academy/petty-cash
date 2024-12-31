@@ -13,7 +13,7 @@ const RequestDetails = () => {
     const [ requestData, setRequestData ] = useState(null)
 
     const fetchRequestData = async () => {
-        const docRef = doc(collection(db, "requests"), requestId);
+        const docRef = doc(db, "requests", requestId);
         try {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {

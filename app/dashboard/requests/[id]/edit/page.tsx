@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/lib/firebase";
-import { collection, doc, getDoc } from "firebase/firestore";
+import { collectioin, doc, getDoc } from "firebase/firestore";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { RequestForm } from "@/components/requests/request-form";
@@ -17,7 +17,7 @@ const EditRequest = () => {
 
   useEffect(() => {
     const fetchRequestData = async () => {
-      const docRef = doc(collection(db, "requests"), requestId);
+      const docRef = doc(db, "requests", requestId);
       try {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
