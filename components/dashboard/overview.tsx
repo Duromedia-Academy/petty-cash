@@ -1,35 +1,73 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
-
-const data = [
-  {
-    name: "Jan",
-    total: 1200,
-  },
-  {
-    name: "Feb",
-    total: 900,
-  },
-  {
-    name: "Mar",
-    total: 1600,
-  },
-  {
-    name: "Apr",
-    total: 1100,
-  },
-  {
-    name: "May",
-    total: 1500,
-  },
-  {
-    name: "Jun",
-    total: 1200,
-  },
-];
+import { useAuth } from "@/components/context/authContext";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export function Overview() {
+  const { user, role } = useAuth();
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requestCollection = collection(db, "requests");
+        let q;
+
+        if (role === "administrator") {
+          q = query(requestCollection);
+        } else {
+          q = query(requestCollection, where("requesterId", "==", user?.uid));
+        }
+
+        const snapshot = await getDocs(q);
+        const requests = snapshot.docs.map((doc) => ({
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate(),
+        }));
+
+        // Get last 6 months
+        const today = new Date();
+        const last6Months = Array.from({ length: 6 }, (_, i) => {
+          const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+          return {
+            month: d.getMonth(),
+            year: d.getFullYear(),
+            name: d.toLocaleString("default", { month: "short" }),
+          };
+        });
+
+        const monthlyData = last6Months
+          .map(({ month, year, name }) => {
+            const monthRequests = requests.filter((req) => {
+              if (!req.createdAt) return false;
+              return (
+                req.createdAt.getMonth() === month &&
+                req.createdAt.getFullYear() === year
+              );
+            });
+
+            return {
+              name,
+              total: monthRequests.length,
+            };
+          })
+          .reverse();
+
+        setData(monthlyData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setData([]);
+      }
+    };
+
+    if (user) {
+      fetchData();
+    }
+  }, [user, role]);
+
   return (
     <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
@@ -45,7 +83,7 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `${value}`}
         />
         <Bar
           dataKey="total"
