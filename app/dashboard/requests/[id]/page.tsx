@@ -1,7 +1,7 @@
 "use client"
 
 import { db } from "@/lib/firebase"
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc } from "firebase/firestore";
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import RequestInfo from "@/components/requests/RequestInfo";
@@ -13,7 +13,7 @@ const RequestDetails = () => {
     const [ requestData, setRequestData ] = useState(null)
 
     const fetchRequestData = async () => {
-        const docRef = doc(db, "requests", requestId);
+        const docRef = doc(collection(db, "requests"), requestId);
         try {
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
