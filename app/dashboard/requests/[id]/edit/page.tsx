@@ -17,8 +17,8 @@ const EditRequest = () => {
 
   useEffect(() => {
     const fetchRequestData = async () => {
-      const docRef = doc(db, "requests", requestId);
       try {
+        const docRef = doc(db, "requests", requestId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           const data = docSnap.data();
