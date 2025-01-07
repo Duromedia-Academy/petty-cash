@@ -29,15 +29,31 @@ const EditRequest = () => {
 
     const fetchRequestData = async () => {
       try {
-        // Fetch document reference directly with Firestore instance, collection name, and document ID
         const docRef = doc(db, "requests", requestId as string); // Ensure requestId is typed as string
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          const data = docSnap.data() as RequestData;
+          const data = docSnap.data();
 
-          // Check if the current user is authorized to edit this request
-          if (data.requesterId !== user.uid && role !== "administrator") {
+          // Fix for error TS2739
+          const requestData: RequestData = {
+            id: docSnap.id,
+            requesterId: data.requesterId || "",
+            department: data.department || "",
+            purpose: data.purpose || "",
+            items: data.items || [],
+            totalAmount: data.totalAmount || 0,
+            amountInWords: data.amountInWords || "",
+            paymentSchedule: data.paymentSchedule || {},
+            notes: data.notes,
+          };
+
+          // Fix for error TS18047
+          if (
+            user &&
+            data.requesterId !== user.uid &&
+            role !== "administrator"
+          ) {
             toast({
               variant: "destructive",
               title: "Unauthorized",
@@ -47,7 +63,7 @@ const EditRequest = () => {
             return;
           }
 
-          setRequestData({ ...data, id: docSnap.id });
+          setRequestData(requestData);
         } else {
           toast({
             variant: "destructive",
