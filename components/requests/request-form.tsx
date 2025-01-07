@@ -23,6 +23,7 @@ import { redirect } from "next/navigation";
 import { X } from "lucide-react";
 import numeral from "numeral";
 import { toWords } from "number-to-words";
+import { RequestData } from "@/types/index";
 
 const itemSchema = z.object({
   details: z.string().min(1, "Details are required"),
@@ -128,7 +129,7 @@ const handleRequestUpdate = async (id: string, data: {
   });
 };
 
-export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.infer<typeof formSchema>, requestId?: string }) {
+export function RequestForm({ defaultValues, requestId }: { defaultValues?: RequestData, requestId?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
@@ -165,9 +166,9 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
       let amount = (quantity ?? 0) * (unitPrice ?? 0);
       amount = numeral(amount).format('0.00'); // Format amount to two decimal places
       form.setValue(`items.${index}.amount`, amount);
-      totalAmount += parseFloat(amount);
+      totalAmount += parseFloat(amount.toString());
     });
-    totalAmount = numeral(totalAmount).format('0.00');
+    totalAmount = numeral(totalAmount).value() as number;
     form.setValue("totalAmount", totalAmount);
 
     const [naira, kobo] = totalAmount.toString().split(".");
@@ -185,13 +186,13 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: z.in
       if (user) {
         const { uid, displayName } = user;
         if (requestId) {
-          await handleRequestUpdate(requestId, values);
+          await handleRequestUpdate(requestId, values as RequestData);
           toast({
             title: "Success",
             description: "Your request has been updated.",
           });
         } else {
-          await handleRequestCreation({ ...values, uid, displayName });
+          await handleRequestCreation({ ...values, uid, displayName: displayName as string });
           toast({
             title: "Success",
             description: "Your request has been submitted.",

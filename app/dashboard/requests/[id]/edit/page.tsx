@@ -7,14 +7,14 @@ import { useState, useEffect } from "react";
 import { RequestForm } from "@/components/requests/request-form";
 import { useAuth } from "@/components/context/authContext"; // Assuming you have an auth hook
 import { useToast } from "@/components/ui/use-toast";
-import { RequestData } from "@/types/index";
+import { PettyCashRequest } from "@/types/index";
 
 const EditRequest = () => {
   const { id: requestId } = useParams() as { id: string }; // Explicitly type useParams
   const router = useRouter();
   const { toast } = useToast();
   const { user, role } = useAuth(); // Get the current user
-  const [requestData, setRequestData] = useState<RequestData | null>(null);
+  const [requestData, setRequestData] = useState<PettyCashRequest | null>(null);
 
   useEffect(() => {
     if (!requestId) {
@@ -35,17 +35,32 @@ const EditRequest = () => {
         if (docSnap.exists()) {
           const data = docSnap.data();
 
-          // Fix for error TS2739
-          const requestData: RequestData = {
+          const requestData: PettyCashRequest = {
             id: docSnap.id,
             requesterId: data.requesterId || "",
-            department: data.department || "",
-            purpose: data.purpose || "",
-            items: data.items || [],
+            requesterName: data.requesterName || "",
             totalAmount: data.totalAmount || 0,
+            purpose: data.purpose || "",
+            status: data.status || "pending",
+            createdAt: data.createdAt.toDate(),
+            updatedAt: data.updatedAt.toDate(),
+            department: data.department || "",
             amountInWords: data.amountInWords || "",
-            paymentSchedule: data.paymentSchedule || {},
+            paymentSchedule: {
+              accountName: data.paymentSchedule.accountName || "",
+              accountNumber: data.paymentSchedule.accountNumber || "",
+              bankName: data.paymentSchedule.bankName || "",
+              plantCode: data.paymentSchedule.plantCode || "",
+            },
+            items: data.items.map((item: any) => ({
+              details: item.details || "",
+              quantity: item.quantity || 0,
+              unitPrice: item.unitPrice || 0,
+              amount: item.amount || 0,
+            })) || [],
             notes: data.notes,
+            approvedBy: data.approvedBy,
+            approverComment: data.approverComment,
           };
 
           // Fix for error TS18047

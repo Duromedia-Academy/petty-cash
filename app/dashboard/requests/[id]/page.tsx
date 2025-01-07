@@ -6,12 +6,12 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import RequestInfo from "@/components/requests/RequestInfo";
 import { useAuth } from "@/components/context/authContext";
-import { RequestData } from "@/types/index";
+import { PettyCashRequest, UserRole } from "@/types/index";
 
 const RequestDetails = () => {
   const { id: requestId } = useParams() as { id: string }; // Explicitly type useParams
   const { role } = useAuth();
-  const [requestData, setRequestData] = useState<RequestData | null>(null);
+  const [requestData, setRequestData] = useState<PettyCashRequest | null>(null);
 
   const fetchRequestData = async () => {
     try {
@@ -19,8 +19,7 @@ const RequestDetails = () => {
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setRequestData({ ...data, id: docSnap.id });
-        console.log("Document data:", { ...data, id: docSnap.id });
+        setRequestData({ ...data, id: docSnap.id } as PettyCashRequest);
       } else {
         console.log("No such document!");
       }
@@ -39,7 +38,7 @@ const RequestDetails = () => {
       <div className="grid gap-6">
         <RequestInfo
           request={requestData}
-          role={role}
+          role={(role as UserRole) || "requester"} // Ensure role is of type UserRole
           refetchData={fetchRequestData}
         />
       </div>

@@ -7,6 +7,36 @@ export type UserRole =
 export type RequestData = {
   id: string;
   requesterId: string;
+  requesterName: string;
+  totalAmount: number;
+  purpose: string;
+  status: 
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "completed"
+    | "not completed"
+    | "passed"
+    | "not passed";
+  createdAt: Date;
+  updatedAt: Date;
+  department: string;
+  amountInWords: string;
+  paymentSchedule: {
+    accountName: string;
+    accountNumber: string;
+    bankName: string;
+    plantCode: string;
+  };
+  items: Array<{
+    details: string;
+    quantity: number;
+    unitPrice: number;
+    amount: number;
+  }>;
+  notes?: string;
+  approvedBy?: string;
+  approverComment?: string;
   [key: string]: any;
 };
 
