@@ -1,18 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["dom", "es6"],
+    "target": "es2020",
+    "lib": ["dom", "dom.iterable", "es2020"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "CommonJS",
+    "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "plugins": [

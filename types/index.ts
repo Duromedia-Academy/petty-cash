@@ -1,4 +1,14 @@
-export type UserRole = "requester" | "superior" | "accountant" | "administrator";
+export type UserRole =
+  | "requester"
+  | "superior"
+  | "accountant"
+  | "administrator";
+
+export type RequestData = {
+  id: string;
+  requesterId: string;
+  [key: string]: any;
+};
 
 export interface User {
   id: string;
@@ -16,7 +26,14 @@ export interface PettyCashRequest {
   totalAmount: number;
   purpose: string;
   notes?: string;
-  status: "pending" | "approved" | "rejected" | "completed" | "not completed" | "passed" | "not passed";
+  status:
+    | "pending"
+    | "approved"
+    | "rejected"
+    | "completed"
+    | "not completed"
+    | "passed"
+    | "not passed";
   createdAt: Date;
   updatedAt: Date;
   approvedBy?: string;

@@ -1,20 +1,21 @@
 "use client";
 
 import { db } from "@/lib/firebase";
-import { doc, getDoc, Firebase } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import RequestInfo from "@/components/requests/RequestInfo";
 import { useAuth } from "@/components/context/authContext";
+import { RequestData } from "@/types/index";
 
 const RequestDetails = () => {
-  const { id: requestId } = useParams();
+  const { id: requestId } = useParams() as { id: string }; // Explicitly type useParams
   const { role } = useAuth();
-  const [requestData, setRequestData] = useState(null);
+  const [requestData, setRequestData] = useState<RequestData | null>(null);
 
   const fetchRequestData = async () => {
     try {
-      const docRef = doc(db as Firebase, "requests", requestId);
+      const docRef = doc(db, "requests", requestId as string); // Ensure requestId is typed as string
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const data = docSnap.data();
