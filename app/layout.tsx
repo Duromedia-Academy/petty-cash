@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 import { AuthProvider } from "@/components/context/authContext";
+import { MobileSidebarProvider } from "@/components/context/mobileSidebarContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,8 +28,10 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            {children}
-            <Toaster />
+            <MobileSidebarProvider>
+              {children}
+              <Toaster />
+            </MobileSidebarProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>
