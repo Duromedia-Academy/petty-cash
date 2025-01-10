@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -36,9 +36,23 @@ const formSchema = z
 
 export default function ResetPasswordForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ResetPasswordFormContent
+        router={router}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        toast={toast}
+      />
+    </Suspense>
+  );
+}
+
+function ResetPasswordFormContent({ router, isLoading, setIsLoading, toast }) {
+  const searchParams = useSearchParams();
   const oobCode = searchParams.get("oobCode"); // Get the oobCode from the query parameters
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -69,7 +83,9 @@ export default function ResetPasswordForm() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: (error as any).message || "Failed to reset password. Please try again.",
+        description:
+          (error as any).message ||
+          "Failed to reset password. Please try again.",
       });
     } finally {
       setIsLoading(false);
