@@ -5,15 +5,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
-// import { User } from "@/types/index";
+import { UserRole } from '@/types/index';
 
 interface User {
-  id: string;
   uid: string;
-  displayName: string;
-  email: string;
-  role: string;
-  photoURL: string;
+  id: string;
+  displayName: any;
+  email: any;
+  role: UserRole;
+  photoURL: any;
 }
 
 const UserList = () => {
@@ -30,8 +30,12 @@ const UserList = () => {
 
       const unsubscribe = await onSnapshot(q, (snapshot) => {
         const users: User[] = snapshot.docs.map((doc) => ({
+          uid: doc.id,
           id: doc.id,
-          ...doc.data(),
+          displayName: doc.data().displayName,
+          email: doc.data().email,
+          role: doc.data().role as UserRole,
+          photoURL: doc.data().photoURL,
         }));
         setUsers(users);
       });
@@ -66,7 +70,7 @@ const UserList = () => {
                   {user.displayName
                     ? user.displayName
                         .split(" ")
-                        .map((n) => n[0])
+                        .map((n: string) => n[0]) // Add type annotation here
                         .join("")
                         .toUpperCase()
                     : ""}
@@ -87,7 +91,7 @@ const UserList = () => {
       <UserEditDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        user={selectedUser}
+        user={selectedUser as import("C:/Users/USER/Documents/Projects/Four-4/project/types/index").User}
       />
     </div>
   );

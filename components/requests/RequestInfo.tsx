@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { format } from "date-fns";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
@@ -9,7 +9,13 @@ import { PettyCashRequest, UserRole } from "@/types";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -17,7 +23,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
+import firebase from "firebase/app";
 
 interface RequestInfoProps {
   request: PettyCashRequest | null;
@@ -48,20 +55,28 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
     if (!request) return null;
 
     const { status } = request;
-    let buttons :any[] = [];
+    let buttons: any[] = [];
 
     if (role === "superior") {
       buttons = [
         {
           status: "not passed",
           label: "Not Pass",
-          disabled: status === "not passed" || status === "approved" || status === "not completed" || status === "completed",
+          disabled:
+            status === "not passed" ||
+            status === "approved" ||
+            status === "not completed" ||
+            status === "completed",
           action: () => updateStatus("not passed"),
         },
         {
           status: "passed",
           label: "Pass",
-          disabled: status === "passed" || status === "approved" || status === "not completed" || status === "completed",
+          disabled:
+            status === "passed" ||
+            status === "approved" ||
+            status === "not completed" ||
+            status === "completed",
           action: () => updateStatus("passed"),
         },
       ];
@@ -105,15 +120,19 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
         onClick={action}
         className={
           disabled
-        ? "border-gray-300 text-gray-500 cursor-not-allowed"
-        : status === "completed" || status === "approved" || status === "passed"
-        ? "border-green-500 text-green-500 hover:text-green-500 hover:bg-green-100"
-        : "border-red-500 text-red-500 hover:text-red-500 hover:bg-red-100"
+            ? "border-gray-300 text-gray-500 cursor-not-allowed"
+            : status === "completed" ||
+              status === "approved" ||
+              status === "passed"
+            ? "border-green-500 text-green-500 hover:text-green-500 hover:bg-green-100"
+            : "border-red-500 text-red-500 hover:text-red-500 hover:bg-red-100"
         }
       >
         {loading ? (
           <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : status === "completed" || status === "approved" || status === "passed" ? (
+        ) : status === "completed" ||
+          status === "approved" ||
+          status === "passed" ? (
           <CheckCircle className="mr-2 h-5 w-5" />
         ) : (
           <XCircle className="mr-2 h-5 w-5" />
@@ -126,8 +145,12 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
   if (!request) {
     return (
       <div className="h-80 flex flex-col items-start justify-center">
-        <p className="mb-4">Request is unavailable. Please select a request to view details.</p>
-        <Button onClick={() => router.push('/dashboard/requests')}>Go to Requests</Button>
+        <p className="mb-4">
+          Request is unavailable. Please select a request to view details.
+        </p>
+        <Button onClick={() => router.push("/dashboard/requests")}>
+          Go to Requests
+        </Button>
       </div>
     );
   }
@@ -139,27 +162,33 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
           <CardHeader className="flex flex-row items-center">
             <div className="flex-1 space-y-1">
               <CardTitle>{request.purpose}</CardTitle>
-              <CardDescription>Created By <span className="font-bold text-black">{request.requesterName}</span></CardDescription>
+              <CardDescription>
+                Created By{" "}
+                <span className="font-bold text-black">
+                  {request.requesterName}
+                </span>
+              </CardDescription>
             </div>
             <div className="flex items-center justify-center">
               <Badge
                 className={
-                request.status === "approved"
-                ? "bg-green-500 text-white ml-2 text-sm"
-                : request.status === "completed"
-                ? "bg-green-800 text-white ml-2 text-sm"
-                : request.status === "passed"
-                ? "bg-lime-500 text-white ml-2 text-sm"
-                : request.status === "rejected"
-                ? "bg-red-600 text-white ml-2 text-sm"
-                : request.status === "not completed"
-                ? "bg-orange-800 text-white ml-2 text-sm"
-                : request.status === "not passed"
-                ? "bg-red-500 text-white ml-2 text-sm"
-                : "bg-gray-800 text-white ml-2 text-sm"
+                  request.status === "approved"
+                    ? "bg-green-500 text-white ml-2 text-sm"
+                    : request.status === "completed"
+                    ? "bg-green-800 text-white ml-2 text-sm"
+                    : request.status === "passed"
+                    ? "bg-lime-500 text-white ml-2 text-sm"
+                    : request.status === "rejected"
+                    ? "bg-red-600 text-white ml-2 text-sm"
+                    : request.status === "not completed"
+                    ? "bg-orange-800 text-white ml-2 text-sm"
+                    : request.status === "not passed"
+                    ? "bg-red-500 text-white ml-2 text-sm"
+                    : "bg-gray-800 text-white ml-2 text-sm"
                 }
               >
-                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                {request.status.charAt(0).toUpperCase() +
+                  request.status.slice(1)}
               </Badge>
             </div>
           </CardHeader>
@@ -176,13 +205,24 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
               </div>
               <div className="col-span-2 space-y-2">
                 <h4 className="text-base">Amount in Words</h4>
-                <p className="font-semibold capitalize">{request.amountInWords}</p>
+                <p className="font-semibold capitalize">
+                  {request.amountInWords}
+                </p>
               </div>
             </div>
             <div className="flex items-center justify-start gap-5 flex-wrap">
               <div className="w-40 space-y-2">
                 <h4 className="text-base">Created At</h4>
-                <p className="text-base font-semibold">{request.createdAt ? format(new Date(request.createdAt.seconds * 1000), "MMMM d, yyyy") : "N/A"}</p>
+                <p className="text-base font-semibold">
+                  {request.createdAt
+                    ? format(
+                        request.createdAt instanceof Timestamp
+                          ? request.createdAt.toDate()
+                          : new Date(request.createdAt),
+                        "MMMM d, yyyy"
+                      )
+                    : "N/A"}
+                </p>
               </div>
               <div className="space-y-2">
                 <h4 className="text-base">Department</h4>
@@ -190,28 +230,40 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="text-lg font-semibold underline">Payment Schedule</h4>
+              <h4 className="text-lg font-semibold underline">
+                Payment Schedule
+              </h4>
               <div className="flex items-center justify-start gap-5 flex-wrap">
                 <div className="w-40 space-y-2">
                   <h4 className="text-base">Account Name</h4>
-                  <p className="text-base font-semibold">{request.paymentSchedule.accountName}</p>
+                  <p className="text-base font-semibold">
+                    {request.paymentSchedule.accountName}
+                  </p>
                 </div>
                 <div className="w-40 space-y-2">
                   <h4 className="text-base">Account Number</h4>
-                  <p className="text-base font-semibold">{request.paymentSchedule.accountNumber}</p>
+                  <p className="text-base font-semibold">
+                    {request.paymentSchedule.accountNumber}
+                  </p>
                 </div>
                 <div className="w-40 space-y-2">
                   <h4 className="text-base">Bank Name</h4>
-                  <p className="text-base font-semibold">{request.paymentSchedule.bankName}</p>
+                  <p className="text-base font-semibold">
+                    {request.paymentSchedule.bankName}
+                  </p>
                 </div>
                 <div className="w-40 space-y-2">
                   <h4 className="text-base">Plant Code</h4>
-                  <p className="text-base font-semibold">{request.paymentSchedule.plantCode}</p>
+                  <p className="text-base font-semibold">
+                    {request.paymentSchedule.plantCode}
+                  </p>
                 </div>
               </div>
             </div>
             <div className="space-y-2">
-              <h4 className="text-lg font-semibold underline">Schedule of Items Requested</h4>
+              <h4 className="text-lg font-semibold underline">
+                Schedule of Items Requested
+              </h4>
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -224,16 +276,22 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
                 <TableBody>
                   {request.items.map((item, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{item.details}</TableCell>
+                      <TableCell className="font-medium">
+                        {item.details}
+                      </TableCell>
                       <TableCell>{item.quantity}</TableCell>
                       <TableCell>{item.unitPrice}</TableCell>
-                      <TableCell className="text-right">{item.amount}</TableCell>
+                      <TableCell className="text-right">
+                        {item.amount}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableRow>
                   <TableCell colSpan={3}>Total</TableCell>
-                  <TableCell className="text-right">{request.totalAmount}</TableCell>
+                  <TableCell className="text-right">
+                    {request.totalAmount}
+                  </TableCell>
                 </TableRow>
               </Table>
             </div>
@@ -242,9 +300,9 @@ const RequestInfo = ({ request, role, refetchData }: RequestInfoProps) => {
             {getStatusButtons()}
           </div>
         </Card>
-      ): 
+      ) : (
         "No request selected"
-      }
+      )}
     </>
   );
 };

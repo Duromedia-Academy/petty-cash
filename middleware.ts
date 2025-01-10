@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function middleware(req) {
+export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get("token"); // Retrieve the Firebase token from cookies
 

@@ -20,6 +20,7 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
   updatePassword as firebaseUpdatePassword,
+  User,
 } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -39,7 +40,12 @@ export function UserDetailsForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user, fetchUserData } = useAuth();
-  const { displayName, email, docId } = user;
+
+  if (!user) {
+    return null; // Handle the case where user is null
+  }
+
+  const { displayName, email, docId } = user || {};
 
   const userDetailsForm = useForm<z.infer<typeof userDetailsSchema>>({
     resolver: zodResolver(userDetailsSchema),
@@ -54,12 +60,12 @@ export function UserDetailsForm() {
   ) {
     setIsSubmitting(true);
     try {
-      const userDocRef = doc(db, "users", docId);
+      const userDocRef = doc(db, "users", docId as string);
       await updateDoc(userDocRef, {
         displayName: values.displayName,
         email: values.email,
       });
-      await fetchUserData(user); // Refetch user data
+      await fetchUserData(user as User); // Refetch user data
       toast({
         title: "Success",
         description: "Your details have been updated.",
@@ -161,11 +167,11 @@ export function PasswordForm() {
       });
       passwordForm.reset();
     } catch (error) {
+      const errorMessage = (error as Error).message || "Failed to update password. Please try again.";
       toast({
         variant: "destructive",
         title: "Error",
-        description:
-          error.message || "Failed to update password. Please try again.",
+        description: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

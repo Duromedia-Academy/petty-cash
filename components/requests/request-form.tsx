@@ -164,7 +164,7 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: Requ
       const quantity = numeral(item.quantity).value();
       const unitPrice = numeral(item.unitPrice).value();
       let amount = (quantity ?? 0) * (unitPrice ?? 0);
-      amount = numeral(amount).format('0.00'); // Format amount to two decimal places
+      amount = parseFloat(numeral(amount).format('0.00')); // Format amount to two decimal places
       form.setValue(`items.${index}.amount`, amount);
       totalAmount += parseFloat(amount.toString());
     });
@@ -192,7 +192,19 @@ export function RequestForm({ defaultValues, requestId }: { defaultValues?: Requ
             description: "Your request has been updated.",
           });
         } else {
-          await handleRequestCreation({ ...values, uid, displayName: displayName as string });
+          await handleRequestCreation({
+            ...values,
+            uid,
+            displayName: displayName as string,
+            items: values.items.map((item, index) => ({
+              sn: (index + 1).toString(),
+              details: item.details,
+              quantity: Number(item.quantity),
+              unitPrice: Number(item.unitPrice),
+              amount: Number(item.amount),
+            })),
+            totalAmount: Number(values.totalAmount),
+          });
           toast({
             title: "Success",
             description: "Your request has been submitted.",

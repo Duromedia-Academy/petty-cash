@@ -23,6 +23,7 @@ import {
   where,
   deleteDoc,
   doc,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
@@ -44,6 +45,7 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import firebase from "firebase/app";
 
 const RequestList = () => {
   const { user, role } = useAuth();
@@ -147,11 +149,14 @@ const RequestList = () => {
           {filteredRequests.map((request, index) => (
             <TableRow key={index} className="cursor-pointer">
               <TableCell>
-                {request.createdAt &&
-                  format(
-                    new Date(request.createdAt.seconds * 1000),
-                    "MMM d, yyyy"
-                  )}
+                {request.createdAt
+                  ? format(
+                      request.createdAt instanceof Timestamp
+                        ? request.createdAt.toDate()
+                        : new Date(request.createdAt),
+                      "MMMM d, yyyy"
+                    )
+                  : "N/A"}
               </TableCell>
               {(role === "administrator" ||
                 role === "superior" ||

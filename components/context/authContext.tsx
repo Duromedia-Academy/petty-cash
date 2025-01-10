@@ -2,19 +2,32 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "@/lib/firebase";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
+// Rename local User type to avoid conflict
+type LocalUser = {
+  uid: string;
+  email: string;
+  displayName?: string;
+  docId?: string;
+  photoURL?: string;
+};
+
 interface AuthContextProps {
-  user: User | null;
+  user: LocalUser | null;
   role: string | null;
   loading: boolean;
+  setLoading: (loading: boolean) => void;
+  fetchUserData: (currentUser: FirebaseUser) => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   user: null,
   role: null,
   loading: true,
+  setLoading: () => {},
+  fetchUserData: () => {},
 });
 
 interface AuthProviderProps {
@@ -22,18 +35,19 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<LocalUser | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserData = async (currentUser: User) => {
+  const fetchUserData = async (currentUser: FirebaseUser) => {
     const userEmail = currentUser.email;
     const usersCollection = collection(db, "users");
     const q = query(usersCollection, where("email", "==", userEmail));
     const querySnapshot = await getDocs(q);
     const userDetails = querySnapshot.docs[0].data();
     setUser({
-      ...currentUser,
+      uid: currentUser.uid,
+      email: currentUser.email || "",
       displayName: userDetails.displayName,
       docId: querySnapshot.docs[0].id,
     });
@@ -53,10 +67,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // ...existing code...
+  const value = { user, role, loading, setLoading, fetchUserData };
+  // ...existing code...
+
   return (
-    <AuthContext.Provider
-      value={{ user, role, loading, setLoading, fetchUserData }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

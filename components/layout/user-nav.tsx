@@ -28,11 +28,10 @@ interface UserNavProps {
 
 export function UserNav() {
   const { user, role } = useAuth();
+  const { toast } = useToast();
   const displayName = user?.displayName || "";
   const email = user?.email || "";
   const photoURL = user?.photoURL || "";
-  
-  const { toast } = useToast();
   const initials = displayName
     ? displayName
         .split(" ")
@@ -44,12 +43,12 @@ export function UserNav() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-       document.cookie =
-         "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-         window.location.href = "/signin";
+      document.cookie =
+        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+      window.location.href = "/signin";
       toast({
         title: "Success",
-        description: "You have successfully signout.",
+        description: "You have successfully signed out.",
       });
     } catch (error) {
       console.error("Error signing out:", error);
@@ -81,9 +80,7 @@ export function UserNav() {
             <p className="text-xs leading-none text-muted-foreground">
               {email}
             </p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {role}
-            </p>
+            <p className="text-xs leading-none text-muted-foreground">{role}</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

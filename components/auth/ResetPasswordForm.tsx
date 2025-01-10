@@ -62,11 +62,14 @@ export default function ResetPasswordForm() {
       });
       router.push("/signin");
     } catch (error) {
+      let errorMessage = "Failed to reset password. Please try again.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
       toast({
         variant: "destructive",
         title: "Error",
-        description:
-          error.message || "Failed to reset password. Please try again.",
+        description: (error as any).message || "Failed to reset password. Please try again.",
       });
     } finally {
       setIsLoading(false);

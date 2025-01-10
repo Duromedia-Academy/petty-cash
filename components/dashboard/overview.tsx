@@ -8,7 +8,7 @@ import { db } from "@/lib/firebase";
 
 export function Overview() {
   const { user, role } = useAuth();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ name: string; total: number; }[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,7 +56,7 @@ export function Overview() {
           })
           .reverse();
 
-        setData(monthlyData);
+        setData(monthlyData as { name: string; total: number; }[]);
       } catch (error) {
         console.error("Error fetching data:", error);
         setData([]);
