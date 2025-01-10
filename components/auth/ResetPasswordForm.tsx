@@ -51,7 +51,17 @@ export default function ResetPasswordForm() {
   );
 }
 
-function ResetPasswordFormContent({ router, isLoading, setIsLoading, toast }) {
+function ResetPasswordFormContent({
+  router,
+  isLoading,
+  setIsLoading,
+  toast,
+}: {
+  router: ReturnType<typeof useRouter>;
+  isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  toast: ReturnType<typeof useToast>;
+}) {
   const searchParams = useSearchParams();
   const oobCode = searchParams.get("oobCode"); // Get the oobCode from the query parameters
 
