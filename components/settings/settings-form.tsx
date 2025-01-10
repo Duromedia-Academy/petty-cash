@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
   Form,
@@ -37,23 +37,24 @@ const passwordSchema = z.object({
 });
 
 export function UserDetailsForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user, fetchUserData } = useAuth();
+
+  const userDetailsForm = useForm<z.infer<typeof userDetailsSchema>>({
+    resolver: zodResolver(userDetailsSchema),
+    defaultValues: {
+      displayName: user?.displayName || "",
+      email: user?.email || "",
+    },
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!user) {
     return null; // Handle the case where user is null
   }
 
   const { displayName, email, docId } = user || {};
-
-  const userDetailsForm = useForm<z.infer<typeof userDetailsSchema>>({
-    resolver: zodResolver(userDetailsSchema),
-    defaultValues: {
-      displayName: displayName || "",
-      email: email || "",
-    },
-  });
 
   async function onSubmitUserDetails(
     values: z.infer<typeof userDetailsSchema>

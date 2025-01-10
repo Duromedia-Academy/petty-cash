@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
-import { UserRole } from '@/types/index';
+import { UserRole, User } from '@/types/index';
 
 interface User {
   uid: string;
@@ -91,7 +91,7 @@ const UserList = () => {
       <UserEditDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        user={selectedUser as import("C:/Users/USER/Documents/Projects/Four-4/project/types/index").User}
+        user={selectedUser as User}
       />
     </div>
   );
