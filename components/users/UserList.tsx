@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { db } from "@/lib/firebase";
 import { collection, query, onSnapshot } from "firebase/firestore";
 import Image from "next/image";
-import { UserRole, User } from '@/types/index';
+import { UserRole } from '@/types/index';
 
 interface User {
   uid: string;
