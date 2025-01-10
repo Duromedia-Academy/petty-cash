@@ -12,7 +12,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <DashboardHeader />
       <div className="flex">
         <aside
-          className={` "w-64 border-r bg-muted/40 h-[calc(100vh-3.5rem)] sticky top-14"
+          className={`w-64 border-r bg-muted/40 h-[calc(100vh-3.5rem)] sticky top-14
             ${isOpen ? "" : "hidden md:block"}
           `}
         >
