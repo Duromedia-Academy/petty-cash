@@ -37,7 +37,6 @@ const formSchema = z
 export default function ResetPasswordForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -45,7 +44,6 @@ export default function ResetPasswordForm() {
         router={router}
         isLoading={isLoading}
         setIsLoading={setIsLoading}
-        toast={toast}
       />
     </Suspense>
   );
@@ -55,13 +53,12 @@ function ResetPasswordFormContent({
   router,
   isLoading,
   setIsLoading,
-  toast,
 }: {
   router: ReturnType<typeof useRouter>;
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  toast: ReturnType<typeof useToast>;
 }) {
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const oobCode = searchParams.get("oobCode"); // Get the oobCode from the query parameters
 
