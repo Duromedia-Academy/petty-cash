@@ -11,6 +11,16 @@ export async function middleware(req: NextRequest) {
     url.pathname.startsWith(route)
   );
 
+  // Handle root route
+  if (url.pathname === "/") {
+    if (token) {
+      url.pathname = "/dashboard";
+    } else {
+      url.pathname = "/signin";
+    }
+    return NextResponse.redirect(url);
+  }
+
   // Allow access to public routes
   if (isPublicRoute) {
     return NextResponse.next();
@@ -52,5 +62,5 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Specify routes to apply middleware
-  matcher: ["/dashboard/:path*"], // Protect all routes under dashboard
+  matcher: ["/", "/dashboard/:path*"], // Protect the root route and all routes under dashboard
 };
